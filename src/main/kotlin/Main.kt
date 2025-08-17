@@ -1,45 +1,34 @@
 package org.example
 
+import jdk.internal.foreign.abi.riscv64.RISCV64Architecture.Regs.x1
+import jdk.internal.foreign.abi.riscv64.RISCV64Architecture.Regs.x2
 import jdk.jfr.DataAmount
+import kotlin.math.max
+import kotlin.math.roundToInt
 
 fun main() {
-    val encoded = "F2p)v\"y233{0->c}ttelciFc"
-    val firstHalf = encoded.substring(0, encoded.length / 2)
-    val secondHalf = encoded.substring(encoded.length / 2)
-    println("first half is: $firstHalf")
-    println("second half is: $secondHalf")
-    val decryptedFirstHalf = transcriptFirstHalf(firstHalf)
-    val decryptedSecondHalf = transcriptSecondHalf(secondHalf)
-    val result = "$decryptedFirstHalf$decryptedSecondHalf"
-    println("""
-        decrypted firstHalf: $decryptedFirstHalf
-        decrypted secondHalf: $decryptedSecondHalf
-        result: $result
-    """.trimIndent())
+    println("Введите длину первой стороны:")
+    val a = readLine()?.toDouble() ?: 16.0
+    println("Введите длину второй стороны:")
+    val b = readLine()?.toDouble() ?: 22.0
+    calcFenceMaterials(a, b)
 }
-fun transcriptFirstHalf(encoded: String): String {
-    var result: String = encoded
-    result = moveRight(result, 1)
-    result = result.replace('5', 's')
-    result = result.replace('4', 'u')
-    result = moveLeft(result, 3)
-    result = result.replace('0', 'o')
-    return result
+fun calcFenceMaterials(a: Double, b: Double) {
+    val minSide = 2
+    val maxSide = 300
+    val polesGap = 2.5
+    val listWidth = 1.15
+    if (a < minSide || b < minSide) {
+        println("Стороны участка должны быть не менее $minSide метров")
+        return
+    }
+    if (a > maxSide || b > maxSide) {
+        println("Стороны участка должны быть не более $maxSide метров")
+        return
+    }
+    val perimetr = 2 * (a + b)
+    val polesAmount = ((perimetr / polesGap) * 1.1).roundToInt()
+    val fenceListAmount = ((perimetr / listWidth) * 1.15).roundToInt()
+    println("Необходимое количество столбов: $polesAmount")
+    println("Необходимое количество листов профлиста: $fenceListAmount")
 }
-fun transcriptSecondHalf(encoded: String): String {
-    var result: String = encoded
-    result = result.reversed()
-    result = moveLeft(result, 4)
-    result = result.replace('_', ' ')
-    return result
-}
-fun moveRight(encoded: String, amount: Int): String {
-    return encoded.map { c -> c + amount}.joinToString("")
-}
-fun moveLeft(encoded: String, amount: Int): String {
-    return encoded.map { c -> c - amount }.joinToString("")
-}
-
-
-
-
